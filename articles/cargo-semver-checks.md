@@ -38,7 +38,7 @@ pub struct ConfigError {}
 pub type Err = ConfigError;
 ```
 
-これは人がチェックしていたらうっかり見落としていまう可能があります．そんなときでもcargo-semver-checksを使えばバッチシ弾いてくれるわけです．
+これは人がチェックしていたら見落としていまう可能があります．そんなときでもcargo-semver-checksを使えばバッチシ弾いてくれるわけです．
 
 ```:error
 --- failure enum_missing: pub enum removed or renamed ---
