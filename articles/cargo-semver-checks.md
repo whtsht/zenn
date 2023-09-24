@@ -6,7 +6,7 @@ topics: ["rust", "cargo"]
 published: true
 ---
 
-cargoは[SemVer](https://semver.org/)を使用してバーション管理をしています．さらに[SemVer Compatibility](https://doc.rust-lang.org/cargo/reference/semver.html)にバーションの互換性を保つためのルールが文章化されています．
+cargoは[SemVer](https://semver.org/)を使用してバーション管理をしています．さらに[SemVer Compatibility](https://doc.rust-lang.org/cargo/reference/semver.html)にライブラリの互換性を保つためのルールが文章化されています．
 
 [SemVer Compatibility](https://doc.rust-lang.org/cargo/reference/semver.html)では変更を以下のように分類しています．
 
@@ -29,7 +29,7 @@ cargoは[SemVer](https://semver.org/)を使用してバーション管理をし�
 pub struct Error {}
 ```
 
-バーション1.1.0では`Error`を`ConfigError`という名前にして変更したいとします．しかし互換性を崩さないためにタイプエイリアスを追加しようとしましたが，うっかり名前を`Error`ではなく`Err`にしてしまいました．これでは互換性が壊れてしまいます．
+バーション1.1.0では`Error`を`ConfigError`という名前にして変更したいとします．しかし互換性を保つためにタイプエイリアスを追加しようとしましたが，うっかり名前を`Error`ではなく`Err`にしてしまいました．これでは互換性が壊れてしまいます．
 
 ```rust:[1.1.0 mistaken] lib.rs
 pub struct ConfigError {}
