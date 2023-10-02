@@ -168,4 +168,4 @@ https://wiki.archlinux.org/title/TigerVNC
 
 https://wiki.archlinux.org/title/Wake-on-LAN
 
-大抵のことはArchWikiに書いています．
+大抵のことはArchWikiに書いてあります．
