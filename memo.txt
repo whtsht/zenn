@@ -1,0 +1,4 @@
+WOL永続化
+$ paru -S wol-systemd
+$ sudo systemctl enable wol@<interface>
+
