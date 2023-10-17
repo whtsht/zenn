@@ -71,7 +71,7 @@ script 内で`count`変数と`increment`関数が定義されています．ボ�
 
 シンプルかつ直感的に書けるのが Svelte の魅力です．
 
-https://svelte.dev/repl/a169097010584c988d4d921ee64e29e7?version=4.2.1
+https://svelte.dev/repl/d8d733107c2f4c54989122c0d6027578?version=4.2.1
 
 ## コンポーネントのパラメータ
 
@@ -96,7 +96,7 @@ Counter.svelte は`count`という変数を受け取っています．App.svelte
 
 ```javascript:App.svelte
 <script>
-	import Counter from "./Counter.svelte"
+    import Counter from "./Counter.svelte"
 </script>
 
 <Counter count={100}/>
@@ -179,8 +179,31 @@ https://svelte.dev/repl/ffbaab64ae8a42529b35c0c9ba7f07a1?version=4.2.1
 
 もしコンポーネント内のみで変数を使いたい場合は`writable`は使わず，`let`を使うと良いでしょう．
 
----
+## アニメーション
 
-ここで紹介しきれないものは公式ドキュメントに書いてあるので適時確認してください．
+Svelte はアニメーションに関するライブラリも提供しています．
+
+以下は`fly`というアニメーションを使って要素を動かしています．Svelte のアニメーションは主にロジックブロックとセットで使います．簡単にパワーポイントのようなアニメーションを作ることができます．
+
+```javascript:App.svelte
+<script>
+    import { fly } from "svelte/transition";
+
+    let visible = false;
+</script>
+
+<button on:click={() => (visible = !visible)}>click</button>
+{#if visible}
+    <div transition:fly={{ x: 200, duration: 500 }}>
+        <p>hello</p>
+    </div>
+{/if}
+```
+
+https://svelte.dev/repl/601ccf3b799444818eb4227e81fccb69?version=4.2.1
+
+## まとめ
+
+Svelte の基本的な機能を一部紹介しました．ここで紹介しきれないものは公式ドキュメントに書いてあるので適時確認してください．
 
 https://svelte.dev/docs
