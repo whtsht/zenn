@@ -82,7 +82,7 @@ xprofileに以下のように記述をすれば自動的に起動できます．
 
 ```:~/.xprofile
 ...
-x0vncserver -rfbauth ~/.vnc/passwd &
+$ x0vncserver -rfbauth ~/.vnc/passwd &
 ```
 
 ## SSHポートフォワーディング
@@ -96,13 +96,13 @@ VNCはデータを圧縮して送りますが暗号化はしません．なの�
 クライアント側からSSHポートフォワーディングします．
 
 ```
-ssh <target_IP_address> -L 9900:localhost:5900
+$ ssh <target_IP_address> -L 9900:localhost:5900
 ```
 
 後はVNCViewを使って遠隔操作ができるようになります．GUI画面から電源を切ることも可能です．
 
 ```
-vncviewer localhost:9900
+$ vncviewer localhost:9900
 ```
 
 ## Wake-on-LAN
@@ -137,13 +137,13 @@ $ sudo pacman -S wol
 クライアントからサーバーの電源を入れることを試みます．同じネットワーク内に属している場合はMACアドレスのみを指定すればOKです．
 
 ```
-wol <target_MAC_address>
+$ wol <target_MAC_address>
 ```
 
 違うネットワークに属している場合はルータのIPアドレス(グローバルIPアドレス)を指定します．
 
 ```
-wol -p <forwarded_port> -i <router_IP> <target_MAC_address>
+$ wol -p <forwarded_port> -i <router_IP> <target_MAC_address>
 ```
 
 MACアドレスは以下のコマンドで確認できます．
