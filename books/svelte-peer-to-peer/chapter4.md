@@ -8,7 +8,7 @@ free: true
 今回作るアプリの雛形をダウンロードします．好きなディレクトリ下で以下のコマンドを実行してください．
 
 ```
-$ git clone https://github.com/whtsht/webrtc-playground.git && cd webtrc-playground && git switch start
+$ git clone https://github.com/whtsht/webrtc-playground.git && cd webrtc-playground && git switch start
 ```
 
 以下のようなフォルダ構成になっているはずです．
@@ -22,9 +22,70 @@ $ git clone https://github.com/whtsht/webrtc-playground.git && cd webtrc-playgro
 
 ap フォルダにはサーバー側のコードが，web フォルダにはクライアント側のコードがあります．
 
+### Web サーバーの起動
+
+好きな Terminal を開いて以下を実行してください．
+
+```
+$ cd web
+yarn を使う場合
+$ yarn
+$ yarn run dev
+npm を使う場合
+$ npm install
+$ npm run dev
+```
+
+[http://localhost:5173](http://localhost:5173)で Web サーバーが起動するのでブラウザで開いてください．
+
+### シグナリングサーバーの起動
+
+Terminal をもう１つ開いて以下を実行してください．
+
+```
+$ cd ap
+yarn を使う場合
+$ yarn
+$ yarn run dev
+npm を使う場合
+$ npm install
+$ npm run dev
+```
+
+### 既存ファイルの説明
+
+このリポジトリには，作業を減らすために，既にいくつかの typescript ファイルや svelte コンポーネントが存在します．
+
+-   web/src/lib/Modal.svelte
+    ポップアップの表示に使います．このアプリでは確認画面，ビデオ通話画面，ゲーム画面などに多用しています．
+-   web/src/lib/SideBar.svelte
+    部屋入室ボタン，退室ボタン，自分の ID や部屋のメンバーの ID を表示するためのサイドバーです．
+-   web/src/lib/SpeechBubble.svelte
+    チャットの吹き出しを表示するためのコンポーネントです．
+-   web/src/lib/Snackbar.svelte
+    システムメッセージを表示するためのコンポーネントです．任意のメッセージを表示でき，2 秒後に自動的に消えます．
+-   web/src/lib/NewRoom.svelte, web/src/lib/LeaveRoom.svelte
+    部屋の入室，退室を行うための画面です．
+-   web/src/webrtc.ts
+    WebRTC API の薄いラッパーです．
+    -   `PeerConnection`
+        他メンバーとの接続を管理するためのインターフェースです．
+    -   `SendSdp`
+        他メンバーに SDP を送信するための関数を表す型です．
+    -   `sendOffer`
+        オファーを送るための関数です．
+    -   `setOffer`
+        送られてきたオファーをセットする関数です．
+    -   `sendAnswer`
+        アンサーを送るための関数です．
+    -   `setAnswer`
+        送られてきたアンサーをセットする関数です．
+-   web/src/chat.ts
+    この章で作るチャットアプリの雛形です．
+
 ## socket.io の使い方
 
-クライアントとの通信には socket.io という WebSocket のライブラリを使います．
+クライアントとの通信には socket.io という WebSocket のライブラリを使います．そのため socket.io の基礎的な使い方を説明します．
 
 -   `io.on` : クライアントからの接続を待ち受けます．
 
@@ -35,7 +96,7 @@ io.on("connection", (socket) => {
 });
 ```
 
-`socket.id`はクライアントの識別子です．これをユーザーの名前としてそのまま使うことにします．
+`socket.id`はクライアントの識別子です．今回作るアプリではこれをユーザーの名前としてそのまま使うことにします．
 
 `${...}`のような書き方がありますが，これはテンプレートリテラルという機能です．テンプレートリテラルを使うと，文字列の中に変数を埋め込むことができます．
 
@@ -53,7 +114,7 @@ io.on("connection", (socket) => {
 });
 ```
 
-`message`は任意のオブジェクトを受け取ることができます．
+`message`は任意のオブジェクトを受け取ることができます．また複数の引数を受け取ることもできます．
 
 -   `socket.emit` : クライアントにメッセージを送信します．
 
@@ -79,6 +140,8 @@ io.on("connection", (socket) => {
 });
 ```
 
+socket.io にはルームという機能があります．ルームに参加しているクライアントにだけメッセージを送信することができます．
+
 -   `io.join` : クライアントをルームに参加させます．
 
 ```typescript
@@ -90,8 +153,6 @@ io.on("connection", (socket) => {
     });
 });
 ```
-
-socket.io にはルームという機能があります．ルームに参加しているクライアントにだけメッセージを送信することができます．
 
 -   `io.in(roomName).emit` : ルームに参加しているクライアント全員にメッセージを送信します．
 
@@ -109,7 +170,7 @@ io.on("connection", (socket) => {
 
 ### サーバー側
 
-取り敢えず入室処理を書いてみましょう．ap/src/app.ts を開いてください．
+いよいよコーディングを始めます．まず入室処理を書いてみましょう．ap/src/app.ts を開いてください．
 
 ```typescript:ap/src/app.ts
 import { Server } from "http";
@@ -127,7 +188,7 @@ const io = new SocketIO(httpServer, {
 httpServer.listen(8080);
 ```
 
-HTTP サーバーと WebSocket サーバーの初期化処理が書いてあります．クライアントのウェブサーバーと接続できるように CORS を設定しています．
+HTTP サーバーと socket.io の初期化処理が書いてあります．クライアントのウェブサーバーと接続できるように CORS を設定しています．
 
 https://javascript.keicode.com/newjs/what-is-cors.php
 
@@ -137,6 +198,8 @@ https://javascript.keicode.com/newjs/what-is-cors.php
 -   もし部屋が存在するならば
     -   人数が 4 人未満ならば，部屋に参加させる．
     -   人数が 4 人ならば，エラーを返す．
+
+ちなみに 4 人という数字は勘で決めました．
 
 ```diff typescript:ap/src/app.ts
 ...
@@ -148,10 +211,14 @@ const io = new SocketIO(httpServer, {
     },
 });
 
-+    const members: Map<string, string[]> = new Map();
++    const membersMap: Map<string, string[]> = new Map();
+
+httpServer.listen(8080);
 ```
 
 メンバーの情報を保存するための Map を作成します．
+
+その下に以下のような処理を書きます．
 
 ```diff typescript:ap/src/app.ts
 ...
@@ -186,13 +253,13 @@ const io = new SocketIO(httpServer, {
 httpServer.listen(8080);
 ```
 
-`create or join`という名前のメッセージを待ち受けるようにします．部屋を作成する場合は`created`という名前のメッセージを返します．部屋に参加する場合は`joined`という名前のメッセージを返し，部屋に参加しているメンバーの ID を送信します．さらにメンバーにも`join`という名前のメッセージを送信します．メンバーの ID は SDP を送るときなどに使用します．もし部屋が満員ならば`full`という名前のメッセージを返します．
+`create or join`という名前のメッセージを待ち受けるようにします．部屋を作成する場合は`created`という名前のメッセージを返します．部屋に参加する場合は`joined`という名前のメッセージを返し，部屋に参加しているメンバーの ID を送信します．メンバーの ID は SDP を送るときなどに使用します．もし部屋が満員ならば`full`という名前のメッセージを返します．
 
 ### クライアント側
 
-web/src/webrtc.ts を開いてください．アプリ間で共有する変数と socket.io の初期化処理が書いてあります．ここに入室処理を書いていきます．
+web/src/chat.ts を開いてください．アプリ間で共有する変数と socket.io の初期化処理が書いてあります．ここに入室処理を書いていきます．
 
-```diff typescript:web/src/webrtc.ts
+```diff typescript:web/src/chat.ts
 export function createOrJoinRoom(name: string) {
 -    throw new Error("Not implemented");
 +    return new Promise((resolve, reject) => {
@@ -231,8 +298,11 @@ export function createOrJoinRoom(name: string) {
 ```
 
 引数の`name`は部屋の名前です．`socket.emit`で`create or join`という名前のメッセージを送信します．
-プロミスを返します．プロミスとは非同期処理の結果を表すオブジェクトです．`resolve`と`reject`という関数を引数に取ります．`resolve`は処理が成功した場合に呼び出します．`reject`は処理が失敗した場合に呼び出します．
-`socket.once`は一度だけメッセージを待ち受けます．`created`という名前のメッセージを受け取ったら部屋名を設定して`resolve`を呼び出します．`joined`という名前のメッセージを受け取ったらメンバーの ID を取得して`sendOffer`を呼び出します．`sendOffer`の部分は後ほど説明します．
+この関数はプロミスを返します．プロミスとは非同期処理の結果を表すオブジェクトです．`resolve`と`reject`という関数を引数に取ります．`resolve`は処理が成功した場合に呼び出します．`reject`は処理が失敗した場合に呼び出します．
+
+https://qiita.com/cheez921/items/41b744e4e002b966391a
+
+`socket.once`は一度だけメッセージを待ち受けます．`created`という名前のメッセージを受け取ったら部屋名を設定して`resolve`を呼び出します．`joined`という名前のメッセージを受け取ったらメンバーの ID を取得して `sendOffer`を呼び出します．
 `full`という名前のメッセージを受け取るか，タイマーがタイムアウトしたらエラーなので`reject`を呼び出します．
 
 ## シグナリング
@@ -269,11 +339,11 @@ end
 
 イメージとしては新しく引っ越してきた人が，隣の家に挨拶に行くような感じです．
 
-![](https://storage.googleapis.com/zenn-user-upload/0dbb92bb220d-20231017.png)
-
 それでは実装しましょう！
 
 ### サーバー側
+
+サーバー側は受け取った SDP をそのまま他メンバーに送信するだけです．
 
 ```diff typescript:ap/src/app.ts
 ...
@@ -308,6 +378,8 @@ httpServer.listen(8080);
 
 ### クライアント側
 
+SDP を送る関数を定義します．socket.io の`emit`関数を使ってサーバーに送信します．`JSON.stringify`はオブジェクトを JSON 形式の文字列に変換する関数です．
+
 ```diff typescript:web/src/chat.ts
 function sendSdp(
     type: "offer" | "answer",
@@ -319,6 +391,18 @@ function sendSdp(
 +    socket.emit(type, get(roomName), to, from, JSON.stringify(sdp));
 }
 ```
+
+新しい接続を作成する関数を定義します．WebRTC の接続は`RTCPeerConnection`というクラスで管理します．
+
+https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection
+
+注意しなればならないのは`RTCPeerConnection`はメンバーの数だけ準備する必要があるということです．
+
+![](https://storage.googleapis.com/zenn-user-upload/1763ab85ce59-20231022.png)
+
+白い四角がユーザー，色付きの四角が`RTCPeerConnection`を表しています．
+
+新しく作った接続にイベント処理を追加していきます．
 
 ```diff typescript:web/src/chat.ts
 function newPeerConnection(to: string): RTCPeerConnection {
@@ -381,12 +465,19 @@ function newPeerConnection(to: string): RTCPeerConnection {
 }
 ```
 
+途中で`chatChannel`を作っていますね．これはチャットのメッセージを送受信するためのチャネルです．WebRTC はメッセージを送受信するためにチャネルを作成する必要があります．
+
+新しい接続を`connects`変数に格納しました．今後はこの`connects`変数を使って接続を取得します．
+`connects`変数を直接使うのは面倒なので`getPeer`という関数を定義しておきます．
+
 ```diff typescript:web/src/chat.ts
 function getPeer(to: string): RTCPeerConnection {
 -    throw new Error("Not implemented");
 +    return connects.get(to)!.chatConnection!;
 }
 ```
+
+ICE の候補を送信する関数を定義します．これは SDP を送信する関数とほぼ同じです．
 
 ```diff typescript:web/src/chat.ts
 function sendCandidate(candidate: RTCIceCandidate, to: string, from: string) {
@@ -401,6 +492,8 @@ function sendCandidate(candidate: RTCIceCandidate, to: string, from: string) {
 }
 ```
 
+メッセージを送信する関数を定義します．先程作った`chatChannel`を使います．
+
 ```diff typescript:web/src/chat.ts
 export function sendMessage(message: ChatMessage) {
 -    throw new Error("Not implemented");
@@ -412,9 +505,13 @@ export function sendMessage(message: ChatMessage) {
 }
 ```
 
+相手の接続が閉じた状態だと`chatChannel.send`が例外を投げるので，`try`で囲って無視しています．
+
+次にシグナリングサーバーからのメッセージを受け取る処理を書きます．
+
 ```diff typescript:web/src/chat.ts
 ...
-
+-    socket.on("connect", () => {});
 +    socket.on("connect", () => {
 +        connected = true;
          // ユーザ名を設定する．
@@ -454,7 +551,11 @@ export function sendMessage(message: ChatMessage) {
 +    });
 ```
 
-## メッセージ送信
+`if (to !== socket.id) return;`という処理がありますが，これは自分宛のメッセージでなければ無視するための処理です．
+
+## メッセージ送信 UI
+
+送信処理が書けたので，ユーザーインターフェースを作っていきます．
 
 ```diff typescript:web/src/lib/Chat/Sender.svelte
  <script lang="ts">
@@ -474,6 +575,7 @@ export function sendMessage(message: ChatMessage) {
 +        value = "";
 +    }
 +
+     // テキストボックスにフォーカスがある状態でShift+Enterを押すとメッセージを送信する．
 +    function handleKeyboard(event: KeyboardEvent) {
 +        if (event.shiftKey && event.key === "Enter") {
 +            event.preventDefault();
@@ -512,7 +614,12 @@ export function sendMessage(message: ChatMessage) {
  </style>
 ```
 
-## メッセージ表示
+メッセージを入力するテキストボックスと，メッセージを送信するボタンを作りました．
+
+## メッセージ表示 UI
+
+最後にメッセージを表示する処理を書きます．
+送信または受信したメッセージは`chatMessage`という変数に保存されています(Sender.svelte と chat.ts を確認してください)．これを each ブロックを使って表示させるだけです．
 
 ```diff typescript:web/src/lib/Chat/Main.svelte
  <script lang="ts">
@@ -536,6 +643,9 @@ export function sendMessage(message: ChatMessage) {
 
 ...
 ```
+
+ここまで書けたらもうチャット機能は使えるはずです．ブラウザのウィンドウを 2 つ以上開いて，同じ部屋に入室してみてください．
+![](https://storage.googleapis.com/zenn-user-upload/615a0b64f0c8-20231023.png)
 
 ## まとめ
 
