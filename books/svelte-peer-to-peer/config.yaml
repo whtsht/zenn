@@ -2,7 +2,7 @@ title: "Svelteで始めるP2P通信アプリ開発"
 summary: "WebRTCによるP2P通信を行うアプリケーションをSvelteで作ります．簡単なチャットアプリから初めて，それにビデオ通話機能，ゲーム機能などの拡張をしていきます．"
 topics: ["webrtc", "svelte"]
 published: true
-price: 500
+price: 300
 chapters:
     - chapter1
     - chapter2
