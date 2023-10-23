@@ -1,6 +1,6 @@
 ---
 title: "ゲーム機能の追加"
-free: true
+free: false
 ---
 
 ## 準備
