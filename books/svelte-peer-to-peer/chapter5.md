@@ -5,9 +5,9 @@ free: true
 
 ## 準備
 
-前の章で作ったチャットアプリを拡張して，ビデオ通話機能を追加しましょう！
+前の章で作ったチャットアプリを拡張して、ビデオ通話機能を追加しましょう！
 
-もしこの章からコーディングしたい場合は好きなディレクトリ下で以下のコマンドを実行してください．
+もしこの章からコーディングしたい場合は好きなディレクトリ下で以下のコマンドを実行してください。
 
 ```
 $ git clone https://github.com/whtsht/webrtc-playground.git && cd webrtc-playground && git switch chat
@@ -15,9 +15,9 @@ $ git clone https://github.com/whtsht/webrtc-playground.git && cd webrtc-playgro
 
 ## 設計
 
-WebRTC ではビデオ通話を行うための機能が用意されています．しかしビデオ通話を行うためにはビデオやオーディオのコーディックを相手に伝えなければなりません．2 章で説明したようにビデオのコーディックなどは SDP に含まれています．SDP にコーディックを含めるためには実際にビデオやオーディオを取得して PeerConnection に設定する必要があります．私達は 3 章でこのような処理を書いたでしょうか．はい，書いていませんでしたね．ということで **SDP の受け渡しからやり直し**です．「またそんな面倒なことを......」と思うかもしれませんが，これが全く環境が違うコンピュータ同士で P2P 通信をするということです．しっかりと噛み締めていきましょう．
+WebRTC ではビデオ通話を行うための機能が用意されています。しかしビデオ通話を行うためにはビデオやオーディオのコーディックを相手に伝えなければなりません。2 章で説明したようにビデオのコーディックなどは SDP に含まれています。SDP にコーディックを含めるためには実際にビデオやオーディオを取得して PeerConnection に設定する必要があります。私達は 3 章でこのような処理を書いたでしょうか。はい、書いていませんでしたね。ということで **SDP の受け渡しからやり直し**です。「またそんな面倒なことを......」と思うかもしれませんが、これが全く環境が違うコンピュータ同士で P2P 通信をするということです。しっかりと噛み締めていきましょう。
 
-同じ部屋に入っているメンバー同士のみビデオ通話ができる仕様にします．処理の流れは以下のようにします．
+同じ部屋に入っているメンバー同士のみビデオ通話ができる仕様にします。処理の流れは以下のようにします。
 
 ### ビデオ通話を開始する側（ホスト）
 
@@ -30,14 +30,14 @@ WebRTC ではビデオ通話を行うための機能が用意されています�
 1. ビデオ通話招待メッセージを受け取る
 2. ビデオ通話招待メッセージの Join ボタンを押す
 3. ホストのメンバーにビデオ通話に参加しているメンバーを教えてもらう
-4. 教えてもらったメンバーに対してビデオ通話のコネクションを作成し，SDP，ICE を交換する
+4. 教えてもらったメンバーに対してビデオ通話のコネクションを作成し、SDP、ICE を交換する
 5. ビデオ通話画面を開く
 
 ## WebRTC のチャネルを使った SDP の交換
 
-もう一度シグナリングサーバーを使って SDP の交換を行ってもよいのですが，せっかく前章で苦労して接続した RTCPeerConnection があるので，それを使って SDP の交換を行ってみましょう．
+もう一度シグナリングサーバーを使って SDP の交換を行ってもよいのですが、せっかく前章で苦労して接続した RTCPeerConnection があるので、それを使って SDP の交換を行ってみましょう。
 
-`videoCallConnection` と `negotiateChannel` を追加します．`videoCallConnection` はビデオ通話に使う RTCPeerConnection です．`negotiateChannel` は SDP の交換に使うチャネルです．
+`videoCallConnection` と `negotiateChannel` を追加します。`videoCallConnection` はビデオ通話に使う RTCPeerConnection です。`negotiateChannel` は SDP の交換に使うチャネルです。
 
 ```diff typescript:web/src/webrtc.ts
 ...
@@ -52,7 +52,7 @@ WebRTC ではビデオ通話を行うための機能が用意されています�
 ...
 ```
 
-新しく web/src/videoCall.ts を作成します．
+新しく web/src/videoCall.ts を作成します。
 
 ```typescript:web/src/videoCall.ts
 import { get, writable, type Writable } from "svelte/store";
@@ -229,12 +229,12 @@ function sendSdp(
 }
 ```
 
-`createNegotiationChannel` は `negotiateChannel` を作成する関数です．
-`Negotiate`という型のメッセージの送受信を行います．`Negotiate`で送っているメッセージは前章でシグナリングサーバーに送っていいたメッセージと同じような形をしているのがわかると思います．
+`createNegotiationChannel` は `negotiateChannel` を作成する関数です。
+`Negotiate`という型のメッセージの送受信を行います。`Negotiate`で送っているメッセージは前章でシグナリングサーバーに送っていいたメッセージと同じような形をしているのがわかると思います。
 
-`getMembers`はビデオ通話に参加したいメンバーがビデオ通話のホストに対して送るメッセージです．`getMembers`が送られていたホストはビデオ通話に参加したいメンバーに対して `members` を送ります．`members`を受け取ったメンバーはビデオ通話にすでに参加しているメンバーに対して `startNegotiate` を送ります．この後は SDP や ICE の交換を行います．
+`getMembers`はビデオ通話に参加したいメンバーがビデオ通話のホストに対して送るメッセージです。`getMembers`が送られていたホストはビデオ通話に参加したいメンバーに対して `members` を送ります。`members`を受け取ったメンバーはビデオ通話にすでに参加しているメンバーに対して `startNegotiate` を送ります。この後は SDP や ICE の交換を行います。
 
-次に web/src/chat.ts に`negotiateChannel`を追加します．
+次に web/src/chat.ts に`negotiateChannel`を追加します。
 
 ```diff typescript:web/src/chat.ts
  import { connect } from "socket.io-client";
@@ -323,7 +323,7 @@ function sendSdp(
 
 ## ビデオ通話の UI を作成する
 
-新しく web/src/lib/VideoCall.svelte を作成します．
+新しく web/src/lib/VideoCall.svelte を作成します。
 
 ```typescript:web/src/lib/VideoCall.svelte
 <script lang="ts">
@@ -431,13 +431,13 @@ function sendSdp(
 </style>
 ```
 
-`video`タグを使ってビデオ通話の画面を表示します．`video`タグの`srcObject`に`MediaStream`を設定することでビデオを表示することができます．`onSwitch`では`display`が`true`になったときに`getUserMedia`を使ってビデオとオーディオのストリームを取得します．`$videoCallMembers`のメンバーに対して`startNegotiate`を行い SDP を交換します．`display`が`false`になったときには`video`タグの`srcObject`を`null`に設定してストリームを停止します．
+`video`タグを使ってビデオ通話の画面を表示します。`video`タグの`srcObject`に`MediaStream`を設定することでビデオを表示することができます。`onSwitch`では`display`が`true`になったときに`getUserMedia`を使ってビデオとオーディオのストリームを取得します。`$videoCallMembers`のメンバーに対して`startNegotiate`を行い SDP を交換します。`display`が`false`になったときには`video`タグの`srcObject`を`null`に設定してストリームを停止します。
 
-`closeCall`ではビデオ通話を終了するときに行う処理を書いています．`$videoCallMembers`のメンバーに対して`videoCallConnection`を閉じています．
+`closeCall`ではビデオ通話を終了するときに行う処理を書いています。`$videoCallMembers`のメンバーに対して`videoCallConnection`を閉じています。
 
-画面は`video`タグを並べたものと`Close`ボタンを表示するだけのものです．
+画面は`video`タグを並べたものと`Close`ボタンを表示するだけのものです。
 
-`<!-- svelte-ignore a11y-media-has-caption -->`は`A11y: Media elements must have a <track kind="captions"> `という警告を非表示にします．字幕をつけろと言われているようですが，今回は無視してください．
+`<!-- svelte-ignore a11y-media-has-caption -->`は`A11y: Media elements must have a <track kind="captions"> `という警告を非表示にします。字幕をつけろと言われているようですが、今回は無視してください。
 
 https://developer.mozilla.org/en-US/docs/Web/Guide/Audio_and_video_delivery/Adding_captions_and_subtitles_to_HTML5_video
 
@@ -445,7 +445,7 @@ https://github.com/sveltejs/svelte/issues/5967
 
 ## ビデオ通話招待メッセージ
 
-`ChatMessage`にビデオ通話用のメッセージを追加します．
+`ChatMessage`にビデオ通話用のメッセージを追加します。
 
 ```diff typescript:web/src/chat.ts
 ...
@@ -460,7 +460,7 @@ https://github.com/sveltejs/svelte/issues/5967
  ...
 ```
 
-新しく web/src/lib/Chat/VideoCallMessage.svelte を作成します．
+新しく web/src/lib/Chat/VideoCallMessage.svelte を作成します。
 
 ```typescript:web/src/lib/Chat/VideoCallMessage.svelte
 <script lang="ts">
@@ -480,9 +480,9 @@ https://github.com/sveltejs/svelte/issues/5967
 </SpeechBubble>
 ```
 
-自分以外からのビデオ通話の招待メッセージには`Join`ボタンを表示します．
+自分以外からのビデオ通話の招待メッセージには`Join`ボタンを表示します。
 
-ビデオ通話招待メッセージを表示するように変更します．
+ビデオ通話招待メッセージを表示するように変更します。
 
 ```diff typescript:web/src/lib/Chat/Main.svelte
  <script lang="ts">
@@ -513,7 +513,7 @@ https://github.com/sveltejs/svelte/issues/5967
 
 ## ビデオ通話招待メッセージ送信
 
-Phone アイコンのボタンを押すとビデオ通話の招待メッセージを送るようにします．招待メッセージを送ると同時にビデオ通話画面を表示するようにします．
+Phone アイコンのボタンを押すとビデオ通話の招待メッセージを送るようにします。招待メッセージを送ると同時にビデオ通話画面を表示するようにします。
 
 ```diff typescript:web/src/lib/Chat/Sender.svelte
  <script lang="ts">
@@ -559,7 +559,7 @@ Phone アイコンのボタンを押すとビデオ通話の招待メッセー�
 ...
 ```
 
-部屋を退室するときにビデオ通話のコネクションを閉じるようにします．
+部屋を退室するときにビデオ通話のコネクションを閉じるようにします。
 
 ```diff typescript:web/src/lib/LeaveRoom.svelte
  <script lang="ts">
@@ -580,7 +580,7 @@ Phone アイコンのボタンを押すとビデオ通話の招待メッセー�
 ...
 ```
 
-最後にビデオ通話画面を表示するために `App.svelte` を以下のように変更します．
+最後にビデオ通話画面を表示するために `App.svelte` を以下のように変更します。
 
 ```diff typescript:web/src/App.svelte
 ...
@@ -603,11 +603,11 @@ Phone アイコンのボタンを押すとビデオ通話の招待メッセー�
 ...
 ```
 
-ここまで書けたらもうビデオ通話もできるはずです．片方が右下の Phone アイコンを押すとビデオ通話の招待メッセージが送られます．もう片方が Join ボタンを押すと 2 つのビデオ通話画面が表示されます．音声もちゃんと入っているはずです．
+ここまで書けたらもうビデオ通話もできるはずです。片方が右下の Phone アイコンを押すとビデオ通話の招待メッセージが送られます。もう片方が Join ボタンを押すと 2 つのビデオ通話画面が表示されます。音声もちゃんと入っているはずです。
 
 ![](https://storage.googleapis.com/zenn-user-upload/3c39ef9f1f13-20231023.png)
 
 ## まとめ
 
-この章ではビデオ通話機能を追加しました．WebRTC を使うとビデオ通話を簡単に実装することができました．前章との違いは SDP，ICE の交換にシグナリングサーバーを使わずに WebRTC のチャネル を使って行ったことと，メディアストリームの取得を行ったことです．
-ブラウザからカメラ，マイクのアクセスを許可するかどうか聞かれると思います．許可しないとビデオ通話ができないので注意してください．
+この章ではビデオ通話機能を追加しました。WebRTC を使うとビデオ通話を簡単に実装することができました。前章との違いは SDP、ICE の交換にシグナリングサーバーを使わずに WebRTC のチャネル を使って行ったことと、メディアストリームの取得を行ったことです。
+ブラウザからカメラ、マイクのアクセスを許可するかどうか聞かれると思います。許可しないとビデオ通話ができないので注意してください。
