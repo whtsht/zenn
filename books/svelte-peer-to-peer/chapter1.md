@@ -16,8 +16,8 @@ https://www.youtube.com/watch?v=ON8khxFI73k&t=2s
 
 ## 必要なもの
 
--   git v2.42.0
--   Node.js v18.17.1
+- git v2.42.0
+- Node.js v18.17.1
 
 なお動作確認は Chromium 系のブラウザで行っています。
 
@@ -30,7 +30,3 @@ https://github.com/whtsht/webrtc-playground/issues
 本の内容についての間違いの指摘などは以下のリポジトリの Issue に書いてください。
 
 https://github.com/whtsht/zenn/issues
-
-意見や感想などは以下のメールアドレスにお願いします。
-
-`whiteshirt0079@gmail.com`
