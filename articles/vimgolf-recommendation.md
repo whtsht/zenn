@@ -10,7 +10,7 @@ publish_at: 2023-12-18
 :::message
 この記事は[Vim駅伝](https://vim-jp.org/ekiden/)2023年12月18日の記事です。
 
-前回の記事はkuuoteさんの「できる！LSPクライアント」でした。
+前回の記事はkawarimidollさんの[Vimで現在のファイルのgit diffを確認する](https://zenn.dev/vim_jp/articles/b15bbd5b682cd8)でした。
 
 次回の記事はぺりーさんの「VimをDebugする」です。
 :::
