@@ -3,8 +3,7 @@ title: "VimGolfでVimテクニックを磨く"
 emoji: "🏌️‍♂️"
 type: "tech"
 topics: ["vim", "neovim"]
-published: false
-publish_at: 2023-12-18
+published: true
 ---
 
 :::message
