@@ -29,7 +29,7 @@ cargoは[SemVer](https://semver.org/)を使用してバーション管理をし�
 pub struct Error {}
 ```
 
-バーション1.1.0では`Error`を`ConfigError`という名前にして変更したいとします。しかし互換性を保つためにタイプエイリアスを追加しようとしましたが、うっかり名前を`Error`ではなく`Err`にしてしまいました。これでは互換性が壊れてしまいます。
+バーション1.1.0では`Error`を`ConfigError`という名前に変更したいとします。しかし互換性を保つためにタイプエイリアスを追加しようとしましたが、うっかり名前を`Error`ではなく`Err`にしてしまいました。これでは互換性が壊れてしまいます。
 
 ```rust:[1.1.0 mistaken] lib.rs
 pub struct ConfigError {}
